@@ -1,16 +1,13 @@
 #!/bin/bash
 
-# Обновление системы
-echo "Updating system..."
+# Обновление и установка базового ПО
+echo "Updating system and installing essential packages..."
 sudo apt update && sudo apt upgrade -y
-
-# Установка необходимых пакетов
-echo "Installing essential packages..."
 sudo apt install -y build-essential pkg-config libssl-dev git-all tmux protobuf-compiler
 
-# Создание tmux-сессии и продолжение работы в ней
-echo "Starting tmux session for script continuation..."
-tmux new-session -d -s my_session "bash -c ' \
+# Создание tmux-сессии и выполнение оставшихся команд внутри
+echo "Starting tmux session and continuing script..."
+tmux new-session -d -s nexus_setup "bash -c ' \
   echo \"Installing Nexus CLI...\"; \
   curl https://cli.nexus.xyz/ | sh; \
   echo \"Setting up Cargo environment...\"; \
@@ -22,7 +19,9 @@ tmux new-session -d -s my_session "bash -c ' \
   echo \"export PATH=\$PATH:/path/to/protoc/directory\" >> ~/.bashrc; \
   echo \"Checking protoc version...\"; \
   protoc --version; \
-  echo \"All tasks completed in tmux session.\"'"
+  echo \"Reinstalling Nexus CLI (if necessary)...\"; \
+  curl https://cli.nexus.xyz/ | sh; \
+  echo \"Setup completed!\"'"
 
 # Присоединение к tmux-сессии
-tmux attach -t my_session
+tmux attach -t nexus_setup
